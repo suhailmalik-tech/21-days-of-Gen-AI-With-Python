@@ -1,0 +1,4 @@
+langchain
+langchain-groq
+groq_Api_Key
+env 
