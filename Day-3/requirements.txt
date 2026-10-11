@@ -1,0 +1,4 @@
+Langchain
+Langchain-Google-genai
+GoogleAPI
+env
