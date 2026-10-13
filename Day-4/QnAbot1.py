@@ -1,74 +1,70 @@
-import streamlit as st
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_groq import ChatGroq
+import streamlit as st
 
 load_dotenv()
 
-# ✅ Model set to current active version
-
-
-bot = ChatGroq(model="openai/gpt-oss-20b", temperature=0.7)
-
-
+# Page config / UI
+st.set_page_config(page_title="AI QnA Bot with Memory", page_icon="🤖")
 st.title("🤖 AI QnA Bot with Memory")
-st.markdown("Can remember your old messages because of streamlit session_state functionality!")
+st.markdown(
+    "Remembering conversation history using Streamlit Session State & LCEL."
+)
 
-# 1. Initialize UI message history for Streamlit rendering
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# Initialize Groq LLM Model
+bot = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.7)
 
-# 2. Initialize LangChain history object to pass context to the model
-if "langchain_history" not in st.session_state:
-    st.session_state.langchain_history = []
+# 1. Initializing single unified session state for history
+if "chat_history" not in st.session_state:
+  st.session_state.chat_history = []  # Stores LangChain message objects
 
-# 3. Create a Prompt Template that supports Conversation Memory
+# 2. Creating Prompt Template
 prompt_template = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful AI assistant. Remember and use the context provided in the conversation history."),
+    (
+        "system",
+        (
+            "You are a helpful AI assistant. Accurately remember and use the"
+            " context provided in the conversation history."
+        ),
+    ),
     MessagesPlaceholder(variable_name="chat_history"),
-    ("human", "{input}")
+    ("human", "{input}"),
 ])
 
-# Create the runnable chain
+# Create the LCEL runnable chain
 chain = prompt_template | bot
 
-# Display chat messages from history on app rerun
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+# 3. Display prior messages from session state on every rerun
+for message in st.session_state.chat_history:
+  if isinstance(message, HumanMessage):
+    with st.chat_message("user"):
+      st.markdown(message.content)
+  elif isinstance(message, AIMessage):
+    with st.chat_message("assistant"):
+      st.markdown(message.content)
 
-# Capture user input
+# 4. Capture user input
 query = st.chat_input("Ask Anything")
 if query:
-    # Display user message in UI
-    with st.chat_message("user"):
-        st.markdown(query)
-    st.session_state.messages.append({"role": "user", "content": query})
+  # Display user message immediately in UI
+  with st.chat_message("user"):
+    st.markdown(query)
 
-    # Get response from Gemini model using the chain with history
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            # Pass the input along with accumulated history tuple list
-            res = chain.invoke({
-                "input": query,
-                "chat_history": st.session_state.langchain_history
-            })
-            
-            # Robust extraction logic for text content
-            if isinstance(res.content, list) and len(res.content) > 0:
-                final_text = res.content[0].get('text', '')
-            elif isinstance(res.content, dict):
-                final_text = res.content.get('text', '')
-            else:
-                final_text = res.content
-            
-            st.markdown(final_text)
+  # Get response from model using the chain
+  with st.chat_message("assistant"):
+    with st.spinner("Thinking..."):
+      # Pass input and the full history list to the chain
+      res = chain.invoke(
+          {"input": query, "chat_history": st.session_state.chat_history}
+      )
 
-    # ✅ Update LangChain memory with clean roles (human vs assistant)
-    st.session_state.langchain_history.append(("human", query))
-    st.session_state.langchain_history.append(("assistant", final_text))
+      final_text = res.content
+      st.markdown(final_text)
 
-    # Store in UI history
-    st.session_state.messages.append({"role": "assistant", "content": final_text})
-    
-    st.rerun()
+  # 5. Append messages to session state as LangChain message classes
+  st.session_state.chat_history.append(HumanMessage(content=query))
+  st.session_state.chat_history.append(AIMessage(content=final_text))
+
+ 

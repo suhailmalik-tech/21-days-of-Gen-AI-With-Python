@@ -1,5 +1,7 @@
 langchain
 dotenv
+langchain.community
 langchain-groq
+langchain_google_genai
 streamlit
 pydantic
