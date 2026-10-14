@@ -1,3 +1,4 @@
 .env
 .venv
 chat.db
+venv
