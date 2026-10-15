@@ -1,9 +1,9 @@
-.
 
-🤖 Agentic Chatbot with Stateful Memory
+
+                            🤖 Agentic Chatbot with Stateful Memory
 An interactive, lightning-fast AI chatbot built with LangChain, LangGraph, and Streamlit. Featuring dynamic agentic workflows, branching decision loops, and persistent conversational memory.
 
-✨ Features
+                                           ✨ Features
 Stateful Agent Workflows: Built using LangGraph to handle complex branching logic, loops, and fallback decisions.
 
 Persistent Memory: Maintains contextual user history across dynamic graph nodes for natural, multi-turn conversations.
@@ -12,17 +12,20 @@ Streamlit UI: Intuitive, responsive web application for seamless interaction.
 
 Fast & Lightweight: Optimized workflow pipeline designed for minimal latency.
 
-🛠️ Tech Stack
-Language: Python 3.8+
+                                          🛠️ Tech Stack
+                                         Language: Python 3.8+
 
-Orchestration & Agents: LangChain, LangGraph
+                               Orchestration & Agents: LangChain, LangGraph
 
-Frontend / UI: Streamlit
+                                      Frontend / UI: Streamlit
 
-Version Control: Git
+                                        Version Control: Git
 
-🚀 Getting Started
-Follow these steps to set up and run the project locally on your machine.
+
+
+                                        🚀 Getting Started
+                                        
+                    Follow these steps to set up and run the project locally on your machine.
 
 Prerequisites
 Ensure you have the following installed on your system:
