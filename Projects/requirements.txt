@@ -1,8 +1,11 @@
 langchain
 langchain-core
 langchain-community
+langgraph-checkpoint
 langchain-groq
+sqlalchemy
 langgraph
 python-dotenv
 ipykernel
 streamlit
+sqlite

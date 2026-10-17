@@ -40,7 +40,7 @@ git pull origin main  # Or clone the repo using: git clone <https://github.com/s
 pip install -r requirements.txt
 
 
-Step 3: Verify the Installation
+Step 3: Verify the Installati01on
 
 Check that all dependencies have been installed properly in your active virtual environment:
 
