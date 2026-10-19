@@ -1,6 +1,9 @@
 langchain
 langchain-core
 langchain-community
+langchain-text-splitters
+beautifulsoup4
+pypdf
 langchain-groq
 langgraph
 python-dotenv
