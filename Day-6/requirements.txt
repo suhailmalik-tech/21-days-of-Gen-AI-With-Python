@@ -5,6 +5,8 @@ langchain-text-splitters
 beautifulsoup4
 pypdf
 langchain-groq
+langchain-chroma
+langchain-google-genai
 langgraph
 python-dotenv
 tiktoken
