@@ -1,0 +1,15 @@
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+beautifulsoup4
+pypdf
+langchain-tools
+langchain-groq
+langchain-chroma
+huggingface-sentence-transformers
+langchain-google-genai
+langgraph
+python-dotenv
+tiktoken
+ipykernel
