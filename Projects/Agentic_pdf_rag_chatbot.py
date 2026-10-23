@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import libraries and packages
-from langchain_community.document_loaders import PyPDFDirectoryLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import InMemoryVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langgraph.checkpoint.memory import InMemorySaver
@@ -28,17 +28,25 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-def document_process(path):
-    # Load documents from directory
-    loader = PyPDFDirectoryLoader(path)
-    docs = loader.load()
+# --- CACHE THE EMBEDDING MODEL SO IT LOADS INSTANTLY ---
+@st.cache_resource
+def get_embedding_model():
+    return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+
+def document_process(file_paths):
+    # Load only the specific newly uploaded files (prevents file accumulation bloat)
+    docs = []
+    for file_path in file_paths:
+        loader = PyPDFLoader(file_path)
+        docs.extend(loader.load())
 
     # Split documents into chunks
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     splitted_docs = splitter.split_documents(documents=docs)
 
-    # Create local embeddings and vector store (Fixed argument to 'embedding')
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    # Use the cached embedding model
+    embeddings = get_embedding_model()
     vector_db = InMemoryVectorStore.from_documents(
         documents=splitted_docs, embedding=embeddings
     )
@@ -52,7 +60,6 @@ def document_process(path):
         context = ""
         matched_docs = vector_db.similarity_search(query=query, k=3)
         for splitted_doc in matched_docs:
-       
             context += splitted_doc.page_content + "\n\n"
         return context
 
@@ -81,14 +88,16 @@ if not st.session_state.document_uploaded:
     if uploaded:
         with st.spinner("Processing documents..."):
             path = "./doc_files/"
-            os.makedirs(
-                path, exist_ok=True
-            ) 
-            for file in uploaded:
-                with open(path + file.name, "wb") as f:
-                    f.write(file.getvalue())
+            os.makedirs(path, exist_ok=True)
 
-            document_process(path)
+            saved_file_paths = []
+            for file in uploaded:
+                file_path = os.path.join(path, file.name)
+                with open(file_path, "wb") as f:
+                    f.write(file.getvalue())
+                saved_file_paths.append(file_path)
+
+            document_process(saved_file_paths)
             st.rerun()
 
 if st.session_state.document_uploaded and st.session_state.agent:
