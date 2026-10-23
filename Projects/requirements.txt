@@ -9,3 +9,10 @@ python-dotenv
 ipykernel
 streamlit
 sqlite
+langchain-text-splitters
+beautifulsoup4
+pypdf
+langchain-tools
+langchain-chroma
+langchain-huggingface
+python-dotenv
